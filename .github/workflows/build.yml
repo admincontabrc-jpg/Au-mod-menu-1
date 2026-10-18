@@ -1,0 +1,55 @@
+name: Build AU Mod APK
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET 6
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '6.0.x'
+
+      - name: Download DLLs via NuGet
+        run: |
+          mkdir -p libs/game
+
+          # Instala ferramenta nuget
+          dotnet tool install --global dotnet-nuget-package-downloader 2>/dev/null || true
+
+          # BepInEx via pacote NuGet correto
+          dotnet add package BepInEx.Unity.IL2CPP --version 6.0.0-be.697 --package-directory /tmp/nuget 2>/dev/null || \
+          dotnet add package BepInEx.Unity.IL2CPP --version 6.0.0-be.688 --package-directory /tmp/nuget 2>/dev/null || true
+
+          find /tmp/nuget -name "BepInEx.Core.dll" 2>/dev/null | head -1 | xargs -I{} cp {} libs/ 2>/dev/null || true
+          find /tmp/nuget -name "BepInEx.Unity.IL2CPP.dll" 2>/dev/null | head -1 | xargs -I{} cp {} libs/ 2>/dev/null || true
+          find /tmp/nuget -name "Il2CppInterop.Runtime.dll" 2>/dev/null | head -1 | xargs -I{} cp {} libs/ 2>/dev/null || true
+          find /tmp/nuget -name "0Harmony.dll" 2>/dev/null | head -1 | xargs -I{} cp {} libs/ 2>/dev/null || true
+
+          echo "[LIBS]:" && ls libs/ || true
+
+      - name: Download Among Us Game DLLs
+        run: |
+          dotnet add package AmongUs.GameLibs.Steam --version 2024.9.4 --package-directory /tmp/gamelibs 2>/dev/null || \
+          dotnet add package AmongUs.GameLibs.Steam --version 2024.6.18 --package-directory /tmp/gamelibs 2>/dev/null || true
+
+          find /tmp/gamelibs -name "Assembly-CSharp.dll" | head -1 | xargs -I{} cp {} libs/game/ 2>/dev/null || true
+          find /tmp/gamelibs -name "UnityEngine.CoreModule.dll" | head -1 | xargs -I{} cp {} libs/game/ 2>/dev/null || true
+          find /tmp/gamelibs -name "UnityEngine.IMGUIModule.dll" | head -1 | xargs -I{} cp {} libs/game/ 2>/dev/null || true
+
+          echo "[GAME LIBS]:" && ls libs/game/ || true
+
+      - name: Build DLL
+        run: dotnet build AUModMenu.csproj -c Release
+
+      - name: Upload DLL
+        uses: actions/upload-artifact@v4
+        with:
+          name: AUModMenu-dll
+          path: bin/Release/net6.0/AUModMenu.dll
