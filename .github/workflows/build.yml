@@ -20,25 +20,13 @@ jobs:
         run: |
           mkdir -p libs/game
 
-          wget -q "https://www.nuget.org/api/v2/package/BepInEx.Core/6.0.0-be.674" -O bepcore.zip
-          unzip -q bepcore.zip -d bepcore
-          find bepcore -name "BepInEx.Core.dll" | head -1 | xargs -I{} cp {} libs/
-          rm -rf bepcore bepcore.zip
-
-          wget -q "https://www.nuget.org/api/v2/package/BepInEx.Unity.IL2CPP/6.0.0-be.674" -O bepil2cpp.zip
-          unzip -q bepil2cpp.zip -d bepil2cpp
-          find bepil2cpp -name "BepInEx.Unity.IL2CPP.dll" | head -1 | xargs -I{} cp {} libs/
-          rm -rf bepil2cpp bepil2cpp.zip
-
-          wget -q "https://www.nuget.org/api/v2/package/Il2CppInterop.Runtime/1.4.5" -O interop.zip
-          unzip -q interop.zip -d interop
-          find interop -name "Il2CppInterop.Runtime.dll" | head -1 | xargs -I{} cp {} libs/
-          rm -rf interop interop.zip
-
-          wget -q "https://www.nuget.org/api/v2/package/HarmonyX/2.10.1" -O harmony.zip
-          unzip -q harmony.zip -d harmony
-          find harmony -name "0Harmony.dll" | head -1 | xargs -I{} cp {} libs/
-          rm -rf harmony harmony.zip
+          wget -q "https://github.com/BepInEx/BepInEx/releases/download/v6.0.0-be.674/BepInEx-Unity.IL2CPP-android-arm64-6.0.0-be.674.zip" -O bep.zip
+          unzip -q bep.zip -d bep
+          find bep -name "BepInEx.Core.dll" | head -1 | xargs -I{} cp {} libs/
+          find bep -name "BepInEx.Unity.IL2CPP.dll" | head -1 | xargs -I{} cp {} libs/
+          find bep -name "Il2CppInterop.Runtime.dll" | head -1 | xargs -I{} cp {} libs/
+          find bep -name "0Harmony.dll" | head -1 | xargs -I{} cp {} libs/
+          rm -rf bep bep.zip
 
           echo "[LIBS]:" && ls libs/
 
