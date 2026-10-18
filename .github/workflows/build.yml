@@ -16,10 +16,9 @@ jobs:
         with:
           dotnet-version: '6.0.x'
 
-      - name: Add NuGet sources
+      - name: Add BepInEx NuGet feed
         run: |
           dotnet nuget add source "https://nuget.bepinex.dev/v3/index.json" --name BepInEx
-          dotnet nuget add source "https://unitynuget-feed.azurewebsites.net/index.json" --name Unity
 
       - name: Build DLL
         run: dotnet build AUModMenu.csproj -c Release
